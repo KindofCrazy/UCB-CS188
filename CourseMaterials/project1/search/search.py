@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+
 
 class SearchProblem:
     """
@@ -62,6 +63,12 @@ class SearchProblem:
         util.raiseNotDefined()
 
 
+class SearchNode:
+    def __init__(self, state, moveSequence) -> None:
+        self.state = state
+        self.moveSequence = moveSequence
+
+
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
@@ -70,7 +77,8 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
+
 
 def depthFirstSearch(problem: SearchProblem):
     """
@@ -87,17 +95,87 @@ def depthFirstSearch(problem: SearchProblem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Stack
+    vistedStates = set()
+    frontier = Stack()
+    frontier.push(SearchNode(problem.getStartState(), []))
+
+    while not frontier.isEmpty():
+        node = frontier.pop()
+        if problem.isGoalState(node.state):
+            return node.moveSequence
+        if node.state in vistedStates:
+            continue
+        vistedStates.add(node.state)
+
+        for childState, action, stepCost in problem.getSuccessors(node.state):
+            if childState in vistedStates:
+                continue
+            childMoveSequence = node.moveSequence[:]
+            childMoveSequence.append(action)
+            childNode = SearchNode(childState, childMoveSequence)
+            frontier.push(childNode)
+
+    return None
+
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Queue
+    vistedStates = set()
+    frontier = Queue()
+    frontier.push(SearchNode(problem.getStartState(), []))
+
+    while not frontier.isEmpty():
+        node = frontier.pop()
+        if problem.isGoalState(node.state):
+            return node.moveSequence
+        if node.state in vistedStates:
+            continue
+        vistedStates.add(node.state)
+
+        for childState, action, stepCost in problem.getSuccessors(node.state):
+            if childState in vistedStates:
+                continue
+            childMoveSequence = node.moveSequence[:]
+            childMoveSequence.append(action)
+            childNode = SearchNode(childState, childMoveSequence)
+            frontier.push(childNode)
+
+    return None
+
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+    vistedStates = set()
+    moveCost = {}
+    frontier = PriorityQueue()
+    initialNode = SearchNode(problem.getStartState(), [])
+    moveCost[initialNode] = 0
+    frontier.push(initialNode, 0)
+    
+    while not frontier.isEmpty():
+        node = frontier.pop()
+        if problem.isGoalState(node.state):
+            return node.moveSequence
+        if node.state in vistedStates:
+            continue
+        vistedStates.add(node.state)
+
+        for childState, action, stepCost in problem.getSuccessors(node.state):
+            if childState in vistedStates:
+                continue
+            childMoveSequence = node.moveSequence[:]
+            childMoveSequence.append(action)
+            childCost = moveCost[node] + stepCost
+            childNode = SearchNode(childState, childMoveSequence)
+            moveCost[childNode] = childCost
+            frontier.update(childNode, childCost)
+    return None
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -106,10 +184,38 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueueWithFunction
+
+    vistedStates = set()
+    moveCost = {}
+    frontier = PriorityQueueWithFunction(
+        lambda node: moveCost[node] + heuristic(node.state, problem))
+    initialNode = SearchNode(problem.getStartState(), [])
+    moveCost[initialNode] = 0
+    frontier.push(initialNode)
+
+    while not frontier.isEmpty():
+        node = frontier.pop()
+        if problem.isGoalState(node.state):
+            return node.moveSequence
+        if node.state in vistedStates:
+            continue
+        vistedStates.add(node.state)
+
+        for childState, action, stepCost in problem.getSuccessors(node.state):
+            if childState in vistedStates:
+                continue
+            childMoveSequence = node.moveSequence[:]
+            childMoveSequence.append(action)
+            childCost = moveCost[node] + stepCost
+            childNode = SearchNode(childState, childMoveSequence)
+            moveCost[childNode] = childCost
+            frontier.push(childNode)
+    return None
 
 
 # Abbreviations
