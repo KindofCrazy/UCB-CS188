@@ -156,7 +156,7 @@ def uniformCostSearch(problem: SearchProblem):
     initialNode = SearchNode(problem.getStartState(), [])
     moveCost[initialNode] = 0
     frontier.push(initialNode, 0)
-    
+
     while not frontier.isEmpty():
         node = frontier.pop()
         if problem.isGoalState(node.state):
@@ -174,6 +174,7 @@ def uniformCostSearch(problem: SearchProblem):
             childNode = SearchNode(childState, childMoveSequence)
             moveCost[childNode] = childCost
             frontier.update(childNode, childCost)
+
     return None
 
 
