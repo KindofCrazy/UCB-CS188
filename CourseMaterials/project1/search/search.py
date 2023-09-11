@@ -96,7 +96,7 @@ def depthFirstSearch(problem: SearchProblem):
     """
     "*** YOUR CODE HERE ***"
     from util import Stack
-    vistedStates = set()
+    vistedStates = []
     frontier = Stack()
     frontier.push(SearchNode(problem.getStartState(), []))
 
@@ -106,7 +106,7 @@ def depthFirstSearch(problem: SearchProblem):
             return node.moveSequence
         if node.state in vistedStates:
             continue
-        vistedStates.add(node.state)
+        vistedStates.append(node.state)
 
         for childState, action, stepCost in problem.getSuccessors(node.state):
             if childState in vistedStates:
@@ -123,7 +123,7 @@ def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     from util import Queue
-    vistedStates = set()
+    vistedStates = []
     frontier = Queue()
     frontier.push(SearchNode(problem.getStartState(), []))
 
@@ -133,7 +133,7 @@ def breadthFirstSearch(problem: SearchProblem):
             return node.moveSequence
         if node.state in vistedStates:
             continue
-        vistedStates.add(node.state)
+        vistedStates.append(node.state)
 
         for childState, action, stepCost in problem.getSuccessors(node.state):
             if childState in vistedStates:
@@ -150,7 +150,7 @@ def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     from util import PriorityQueue
-    vistedStates = set()
+    vistedStates = []
     moveCost = {}
     frontier = PriorityQueue()
     initialNode = SearchNode(problem.getStartState(), [])
@@ -163,7 +163,7 @@ def uniformCostSearch(problem: SearchProblem):
             return node.moveSequence
         if node.state in vistedStates:
             continue
-        vistedStates.add(node.state)
+        vistedStates.append(node.state)
 
         for childState, action, stepCost in problem.getSuccessors(node.state):
             if childState in vistedStates:
@@ -191,7 +191,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     from util import PriorityQueueWithFunction
 
-    vistedStates = set()
+    vistedStates = []
     moveCost = {}
     frontier = PriorityQueueWithFunction(
         lambda node: moveCost[node] + heuristic(node.state, problem))
@@ -205,7 +205,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
             return node.moveSequence
         if node.state in vistedStates:
             continue
-        vistedStates.add(node.state)
+        vistedStates.append(node.state)
 
         for childState, action, stepCost in problem.getSuccessors(node.state):
             if childState in vistedStates:
