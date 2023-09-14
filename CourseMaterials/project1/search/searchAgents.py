@@ -305,6 +305,7 @@ class CornersProblem(search.SearchProblem):
         """
         Stores the walls, pacman's starting position and corners.
         """
+        self.gameState = startingGameState
         self.walls = startingGameState.getWalls()
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
@@ -387,10 +388,10 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     """
     A heuristic for the CornersProblem that you defined.
 
-      state:   The current search state
-               (a data structure you chose in your search problem)
+    state:   The current search state
+    (a data structure you chose in your search problem)
 
-      problem: The CornersProblem instance for this layout.
+    problem: The CornersProblem instance for this layout.
 
     This function should always return a number that is a lower bound on the
     shortest path from the state to a goal of the problem; i.e.  it should be
@@ -401,7 +402,95 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     walls = problem.walls
 
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    from util import PriorityQueue
+    from util import manhattanDistance
+    # if (len(state[1]) == 4):
+    #     return 0
+    # possibleValue = []
+    # for corner in corners:
+    #     if corner not in state[1]:
+    #         possibleValue.append(manhattanDistance(state[0], corner))
+
+    # return min(possibleValue)
+
+    from itertools import permutations
+    
+    if (len(state[1]) == 4):
+        return 0
+    
+    nonvisitedCorners = []
+    visitedCorners = state[1][:]
+    for corner in corners:
+        if corner not in visitedCorners:
+            nonvisitedCorners.append(corner)
+    curPos = state[0]
+    estimatedDistance = walls.height * walls.width
+    
+    tmpList = permutations(nonvisitedCorners)
+
+    perList = []
+    for res in tmpList:
+        perList.append(list(res))
+
+    for cors in perList:
+        possibleDistance = 0
+        curPos = state[0]
+        for c in cors:
+            possibleDistance += mazeDistance(curPos, c, problem.gameState)
+            curPos = c
+        estimatedDistance = min(estimatedDistance, possibleDistance)
+
+    return estimatedDistance
+    
+    # for corner in corners:
+    #     if corner not in visitedCorners:
+    #         nearCorners.push(corner, mazeDistance(curPos, corner, problem.gameState))
+
+    # while (not nearCorners.isEmpty()):
+    #     corner = nearCorners.pop()
+    #     estimatedDistance += mazeDistance(curPos, corner, problem.gameState)
+    #     curPos = corner
+    #     visitedCorners.append(corner)
+    #     for c in corners:
+    #         if c not in visitedCorners:
+    #             nearCorners.update(c, mazeDistance(curPos, corner, problem.gameState))
+
+    # return estimatedDistance
+
+    # SmallestDistance = 10000000
+    # curPos = state[0]
+    # for corner in corners:
+    #     visitedCorners = state[1][:]
+    #     possibleDistance = 0
+    #     if corner not in visitedCorners:
+    #         possibleDistance += manhattanDistance(curPos, corner)
+    #         visitedCorners.append(corner)
+    #         nearCorners = PriorityQueue()
+    #         curPos = corner
+    #         for leftCorner in corners:
+    #             if leftCorner not in visitedCorners:
+    #                 nearCorners.push(
+    #                     leftCorner, manhattanDistance(curPos, leftCorner))
+
+    #         while (not nearCorners.isEmpty()):
+    #             newCorner = nearCorners.pop()
+    #             possibleDistance += manhattanDistance(curPos, corner)
+    #             curPos = corner
+    #             visitedCorners.append(newCorner)
+    #             for c in corners:
+    #                 if c not in visitedCorners:
+    #                     nearCorners.update(c, manhattanDistance(curPos, c))
+
+    #     SmallestDistance = min(SmallestDistance, possibleDistance)
+
+    # return SmallestDistance
+
+    # maxDistance = 0
+    # for corner in corners:
+    #     if corner not in state[1]:
+    #         maxDistance = max(0, manhattanDistance(state[0], corner))
+
+    # return maxDistance
 
 
 class AStarCornersAgent(SearchAgent):
@@ -419,8 +508,8 @@ class FoodSearchProblem:
     food (dots) in a Pacman game.
 
     A search state in this problem is a tuple ( pacmanPosition, foodGrid ) where
-      pacmanPosition: a tuple (x,y) of integers specifying Pacman's position
-      foodGrid:       a Grid (see game.py) of either True or False, specifying remaining food
+    pacmanPosition: a tuple (x,y) of integers specifying Pacman's position
+    foodGrid:       a Grid (see game.py) of either True or False, specifying remaining food
     """
 
     def __init__(self, startingGameState: pacman.GameState):
