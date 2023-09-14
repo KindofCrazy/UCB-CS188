@@ -414,10 +414,10 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     # return min(possibleValue)
 
     from itertools import permutations
-    
+
     if (len(state[1]) == 4):
         return 0
-    
+
     nonvisitedCorners = []
     visitedCorners = state[1][:]
     for corner in corners:
@@ -425,7 +425,7 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
             nonvisitedCorners.append(corner)
     curPos = state[0]
     estimatedDistance = walls.height * walls.width
-    
+
     tmpList = permutations(nonvisitedCorners)
 
     perList = []
@@ -441,7 +441,7 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
         estimatedDistance = min(estimatedDistance, possibleDistance)
 
     return estimatedDistance
-    
+
     # for corner in corners:
     #     if corner not in visitedCorners:
     #         nearCorners.push(corner, mazeDistance(curPos, corner, problem.gameState))
