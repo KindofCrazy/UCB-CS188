@@ -116,7 +116,7 @@ def depthFirstSearch(problem: SearchProblem):
             childNode = SearchNode(childState, childMoveSequence)
             frontier.push(childNode)
 
-    return None
+    return []
 
 
 def breadthFirstSearch(problem: SearchProblem):
@@ -143,7 +143,7 @@ def breadthFirstSearch(problem: SearchProblem):
             childNode = SearchNode(childState, childMoveSequence)
             frontier.push(childNode)
 
-    return None
+    return []
 
 
 def uniformCostSearch(problem: SearchProblem):
@@ -175,7 +175,7 @@ def uniformCostSearch(problem: SearchProblem):
             moveCost[childNode] = childCost
             frontier.update(childNode, childCost)
 
-    return None
+    return []
 
 
 def nullHeuristic(state, problem=None):
@@ -216,7 +216,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
             childNode = SearchNode(childState, childMoveSequence)
             moveCost[childNode] = childCost
             frontier.push(childNode)
-    return None
+    return []
 
 
 # Abbreviations
