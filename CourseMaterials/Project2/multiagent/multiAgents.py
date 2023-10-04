@@ -14,7 +14,7 @@
 
 from util import manhattanDistance
 from game import Directions
-import random, util
+import random, util, sys
 
 from game import Agent
 from pacman import GameState
@@ -75,7 +75,15 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        closestFoodDist = min([manhattanDistance(newPos, foodPos) for foodPos in newFood.asList()], default=1)
+        closestGhostDist = min(
+            [manhattanDistance(newPos, ghost.getPosition() ) + ghost.scaredTimer for ghost in newGhostStates]
+            , default=100)
+
+        if (closestGhostDist > 3):
+            return (1 / closestFoodDist)
+        else:
+            return (1 / pow(closestFoodDist, 0.01)) * pow(closestGhostDist, 1)
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
