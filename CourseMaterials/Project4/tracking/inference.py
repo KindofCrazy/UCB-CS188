@@ -732,6 +732,7 @@ class ParticleFilter(InferenceModule):
             newParticles.append(weightedDistribution.sample())
 
         self.particles = newParticles
+
         "*** END YOUR CODE HERE ***"
 
     ########### ########### ###########
