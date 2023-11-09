@@ -744,7 +744,7 @@ def printStarterBayesNet():
     # The first input is the list of unconditioned variables in your factor,
     # the second input is the list of conditioned variables in your factor,
     # and the third input is the dict of domains for your variables.
-    rainingCPT  = Factor(['Raining'], [], variableDomainsDict)
+    rainingCPT = Factor(['Raining'], [], variableDomainsDict)
 
     print("Print a conditional probability table (henceforth known as a CPT) " + \
           "to see a pretty print of the variables in a factor and its " + \

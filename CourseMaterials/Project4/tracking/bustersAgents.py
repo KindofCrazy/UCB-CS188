@@ -9,6 +9,7 @@
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
+# Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
@@ -149,5 +150,13 @@ class GreedyBustersAgent(BustersAgent):
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        livingGhostPosition = [distribution.argMax() for distribution in livingGhostPositionDistributions]
+        livingGhostPosition.sort(key= lambda x : self.distancer.getDistance(pacmanPosition, x))
+        closetGhostPosition = livingGhostPosition[0]
+
+        legal.sort(key= lambda x : self.distancer.getDistance(Actions.getSuccessor(pacmanPosition, x), closetGhostPosition))
+
+        return legal[0]
+
         "*** END YOUR CODE HERE ***"
