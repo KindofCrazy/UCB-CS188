@@ -238,24 +238,15 @@ class LanguageIDModel(object):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
         self.hidden_layer_size1 = 100
-        self.hidden_layer_size2 = 200
-        self.hidden_layer_size3 = 100
         self.batch_size = 200
         self.learning_rate = 0.5
 
         self.w1 = nn.Parameter(self.num_chars, self.hidden_layer_size1)
         self.b1 = nn.Parameter(1, self.hidden_layer_size1)
-        self.w2 = nn.Parameter(self.hidden_layer_size1, len(self.languages))
-        self.b2 = nn.Parameter(1, len(self.languages))
-        self.w_hidden = nn.Parameter(len(self.languages), len(self.languages))
-        self.b_hidden = nn.Parameter(1, len(self.languages))
+        self.w_hidden = nn.Parameter(self.hidden_layer_size1, self.hidden_layer_size1)
 
-        self.w_after1 = nn.Parameter(len(self.languages), self.hidden_layer_size2)
-        self.b_after1 = nn.Parameter(1, self.hidden_layer_size2)
-        self.w_after2 = nn.Parameter(self.hidden_layer_size2, self.hidden_layer_size3)
-        self.b_after2 = nn.Parameter(1, self.hidden_layer_size3)
-        self.w_after3 = nn.Parameter(self.hidden_layer_size3, len(self.languages))
-        self.b_after3 = nn.Parameter(1, len(self.languages))
+        self.w_after1 = nn.Parameter(self.hidden_layer_size1, len(self.languages))
+        self.b_after1 = nn.Parameter(1, len(self.languages))
 
     def run(self, xs):
         """
@@ -287,28 +278,18 @@ class LanguageIDModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
-        z = None
-        is_first = True
-        for x in xs:
-            x = nn.Linear(x, self.w1)
-            x = nn.AddBias(x, self.b1)
-            x = nn.ReLU(x)
-            x = nn.Linear(x, self.w2)
-            x = nn.AddBias(x, self.b2)
-            if is_first:
-                z = x
-                is_first = False
-            else:
-                z = nn.Add(x, nn.AddBias(nn.Linear(z, self.w_hidden), self.b_hidden))
-                z = nn.ReLU(z)
-
-        z = nn.AddBias(nn.Linear(z, self.w_after1), self.b_after1)
+        z = nn.Linear(xs[0], self.w1)
+        z = nn.AddBias(z, self.b1)
         z = nn.ReLU(z)
-        z = nn.AddBias(nn.Linear(z, self.w_after2), self.b_after2)
-        z = nn.ReLU(z)
-        z = nn.AddBias(nn.Linear(z, self.w_after3), self.b_after3)
+        for i in range(1, len(xs)):
+            z = nn.Add(nn.Linear(xs[i], self.w1), nn.Linear(z, self.w_hidden))
+            z = nn.AddBias(z, self.b1)
+            z = nn.ReLU(z)
 
+        z = nn.Linear(z, self.w_after1)
+        z = nn.AddBias(z, self.b_after1)
         return z
+
 
 
     def get_loss(self, xs, y):
@@ -336,17 +317,10 @@ class LanguageIDModel(object):
         while dataset.get_validation_accuracy() < 0.85:
             for xs, y in dataset.iterate_once(self.batch_size):
                 loss = self.get_loss(xs, y)
-                grad_w1, grad_b1, grad_w2, grad_b2, grad_w_hidden, grad_b_hidden, grad_w_after1, grad_b_after1, grad_w_after2, grad_b_after2, grad_w_after3, grad_b_after3 \
-                    = nn.gradients(loss, [self.w1, self.b1, self.w2, self.b2, self.w_hidden, self.b_hidden, self.w_after1, self.b_after1, self.w_after2, self.b_after2, self.w_after3, self.b_after3])
+                grad_w1, grad_b1, grad_w_hidden, grad_w_after1, grad_b_after1 \
+                    = nn.gradients(loss, [self.w1, self.b1, self.w_hidden, self.w_after1, self.b_after1])
                 self.w1.update(grad_w1, -self.learning_rate)
                 self.b1.update(grad_b1, -self.learning_rate)
-                self.w2.update(grad_w2, -self.learning_rate)
-                self.b2.update(grad_b2, -self.learning_rate)
                 self.w_hidden.update(grad_w_hidden, -self.learning_rate)
-                self.b_hidden.update(grad_b_hidden, -self.learning_rate)
                 self.w_after1.update(grad_w_after1, -self.learning_rate)
                 self.b_after1.update(grad_b_after1, -self.learning_rate)
-                self.w_after2.update(grad_w_after2, -self.learning_rate)
-                self.b_after2.update(grad_b_after2, -self.learning_rate)
-                self.w_after3.update(grad_w_after3, -self.learning_rate)
-                self.b_after3.update(grad_b_after3, -self.learning_rate)
