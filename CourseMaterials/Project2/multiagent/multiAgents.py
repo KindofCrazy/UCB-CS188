@@ -239,6 +239,32 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
     """
+    def value(self, state, agentIndex, depth):
+        if depth > self.depth or state.isWin() or state.isLose():
+            return self.evaluationFunction(state), None
+        if agentIndex == 0:
+            return self.max_value(state, 0, depth)
+        else:
+            return self.exp_value(state, agentIndex, depth)
+    def max_value(self, state, agentIndex, depth):
+        v = float('-inf')
+        act = None
+        for action in state.getLegalActions(agentIndex):
+            new_value, a = self.value(state.generateSuccessor(agentIndex, action), 1, depth)
+            if new_value > v:
+                v = new_value
+                act = action
+        return v, act
+
+    def exp_value(self, state, agentIndex, depth):
+        v = 0
+        for action in state.getLegalActions(agentIndex):
+            if agentIndex != state.getNumAgents() - 1:
+                new_value, a = self.value(state.generateSuccessor(agentIndex, action), agentIndex + 1, depth)
+            else:
+                new_value, a = self.value(state.generateSuccessor(agentIndex, action), 0, depth + 1)
+            v += new_value
+        return v / len(state.getLegalActions(agentIndex)), None
 
     def getAction(self, gameState: GameState):
         """
@@ -248,7 +274,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.value(gameState, 0, 1)[1]
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
@@ -258,7 +284,23 @@ def betterEvaluationFunction(currentGameState: GameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    position = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    ghostStates = currentGameState.getGhostStates()
+
+    closestFoodDist = min([manhattanDistance(position, foodPos) for foodPos in food.asList()], default=1)
+    closestGhostDist = min(
+        [manhattanDistance(position, ghost.getPosition()) for ghost in ghostStates]
+        , default=10000)
+
+    if currentGameState.isWin():
+        return 1e10
+    elif currentGameState.isLose():
+        return -1e10
+    elif closestGhostDist > 2:
+        return (1 / pow(closestFoodDist, 0.01)) * 1 / pow(currentGameState.getNumFood(), 1) * 1e8
+    else:
+        return (1 / pow(closestFoodDist, 0.01)) * pow(closestGhostDist, 1) * 1 / pow(currentGameState.getNumFood(), 1) * 1e5
 
 # Abbreviation
 better = betterEvaluationFunction
